@@ -40,7 +40,7 @@ public final class ProgressDialogUtils {
      * @param msg     提示信息
      * @return
      */
-    public static ProgressDialog initProgressBar(Context context, String msg,int iconID) {
+    public static ProgressDialog initProgressBar(Context context, String msg, int iconID) {
         progressBar = new ProgressDialog(context);
         progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressBar.setTitle("提示");

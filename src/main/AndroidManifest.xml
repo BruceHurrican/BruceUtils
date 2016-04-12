@@ -23,8 +23,9 @@
   ~   如果对本代码有好的建议，可以联系BurrceHurrican@foxmail.com
   -->
 
-<manifest package="com.bruceutils"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    package="com.bruceutils"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:allowBackup="true"

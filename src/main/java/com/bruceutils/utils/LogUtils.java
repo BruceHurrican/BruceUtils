@@ -45,7 +45,6 @@ import java.util.Locale;
  * Created by BruceHurrican on 2015/12/9.
  */
 public final class LogUtils {
-    private static boolean IS_OPEN_LOG = true;
     /**
      * sd 卡根目录
      */
@@ -60,12 +59,13 @@ public final class LogUtils {
     public static final String PATH_CRASH_LOG = FILE_PATH_ROOT + "crash/";
     private static final String customTagPrefix = "bruce";
     public static AndroidCustomLog androidCustomLog;
+    private static boolean IS_OPEN_LOG = true;
+
+    private LogUtils() {
+    }
 
     public static void openLog(boolean isOpen) {
         IS_OPEN_LOG = isOpen;
-    }
-
-    private LogUtils() {
     }
 
     public static void v(String content) {
