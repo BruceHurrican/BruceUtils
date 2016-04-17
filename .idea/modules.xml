@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BruceUtils.iml" filepath="$PROJECT_DIR$/BruceUtils.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../JsonApplication.iml" filepath="$PROJECT_DIR$/../JsonApplication.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../app/app.iml" filepath="$PROJECT_DIR$/../app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bruceutils.iml" filepath="$PROJECT_DIR$/bruceutils.iml" />
     </modules>
   </component>
 </project>
