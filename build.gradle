@@ -41,7 +41,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
+
 }
+
+task makeJar(type: Copy){
+    delete 'build/libs/bruceutils.jar'
+    from('build/intermediates/bundles/release/')
+    into('build/libs/')
+    include('classes.jar')
+    rename ('classes.jar', 'bruceutils.jar')
+}
+
+makeJar.dependsOn(build)
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')

@@ -1,3 +1,3 @@
 # BruceUtils
-Offen used in project.
+Often used in project.
 I will often update it.
