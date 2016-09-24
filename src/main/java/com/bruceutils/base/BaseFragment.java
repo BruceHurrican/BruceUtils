@@ -25,13 +25,13 @@
 
 package com.bruceutils.base;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
 import com.bruceutils.utils.LogUtils;

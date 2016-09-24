@@ -25,13 +25,13 @@
 
 package com.bruceutils.base;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
 import com.bruceutils.utils.LogUtils;
@@ -41,7 +41,7 @@ import java.lang.ref.WeakReference;
 /**
  * Created by BruceHurrican on 2016/4/12.
  */
-public class BaseActivity extends Activity {
+public class BaseActivity extends FragmentActivity {
     private BaseApplication application;
     private Context context;
     private UIHandler mUIHandler;
