@@ -25,8 +25,10 @@
 
 package com.bruceutils.utils;
 
+import android.content.Context;
 import android.os.Environment;
 import android.os.StatFs;
+import android.text.format.Formatter;
 import android.util.Log;
 
 import java.io.File;
@@ -37,7 +39,7 @@ import java.io.File;
  */
 public final class StorageUtil {
     public static final String TAG = "StorageUtil";
-    private static final int ERROR = -1;
+    private static final String ERROR = "-1";
 
     private StorageUtil() {
     }
@@ -54,14 +56,18 @@ public final class StorageUtil {
      *
      * @return
      */
-    public static long getAvailableInternalMemorySize() {
+    public static String getAvailableInternalMemorySize(Context context) {
+        if (null == context) {
+            LogUtils.d("param context is null");
+            return ERROR;
+        }
         File path = Environment.getDataDirectory();
         Log.d(TAG, "getAvailableInternalMemorySize path:" + path);
         StatFs stat = new StatFs(path.getPath());
         long blockSize = stat.getBlockSize();
         long availableBlocks = stat.getAvailableBlocks();
         //getAvailableBlocks()已经被getAvailableBlocksLong()代替
-        return availableBlocks * blockSize;
+        return Formatter.formatFileSize(context, availableBlocks * blockSize);
     }
 
     /**
@@ -69,13 +75,17 @@ public final class StorageUtil {
      *
      * @return
      */
-    public static long getTotalInternalMemorySize() {
+    public static String getTotalInternalMemorySize(Context context) {
+        if (null == context) {
+            LogUtils.d("param context is null");
+            return ERROR;
+        }
         File path = Environment.getDataDirectory();
         Log.d(TAG, "getTotalInternalMemorySize path:" + path);
         StatFs stat = new StatFs(path.getPath());
         long blockSize = stat.getBlockSize();
         long totalBlocks = stat.getBlockCount();
-        return totalBlocks * blockSize;
+        return Formatter.formatFileSize(context, totalBlocks * blockSize);
     }
 
     /**
@@ -83,14 +93,18 @@ public final class StorageUtil {
      *
      * @return
      */
-    public static long getAvailableExternalMemorySize() {
+    public static String getAvailableExternalMemorySize(Context context) {
+        if (null == context) {
+            LogUtils.d("param context is null");
+            return ERROR;
+        }
         if (isSDcardExists()) {
             File path = Environment.getExternalStorageDirectory();
             Log.d(TAG, "getAvailableExternalMemorySize path:" + path);
             StatFs stat = new StatFs(path.getPath());
             long blockSize = stat.getBlockSize();
             long availableBlocks = stat.getAvailableBlocks();
-            return availableBlocks * blockSize;
+            return Formatter.formatFileSize(context, availableBlocks * blockSize);
         } else {
             Log.d(TAG, "getAvailableExternalMemorySize no permission");
             return ERROR;
@@ -102,7 +116,11 @@ public final class StorageUtil {
      *
      * @return
      */
-    public static long getTotalExternalMemorySize() {
+    public static String getTotalExternalMemorySize(Context context) {
+        if (null == context) {
+            LogUtils.d("param context is null");
+            return ERROR;
+        }
         if (isSDcardExists()) {
             File path = Environment.getExternalStorageDirectory();
             Log.d(TAG, "getExternalStorageDirectory path:" + path);
@@ -111,7 +129,7 @@ public final class StorageUtil {
             //getBlockSize()已经被getBlockSizeLong()代替
             long totalBlocks = stat.getBlockCount();
             //getBlockCount()已经被getBlockCountLong()代替
-            return totalBlocks * blockSize;
+            return Formatter.formatFileSize(context, totalBlocks * blockSize);
         } else {
             Log.d(TAG, "getExternalStorageDirectory no permission");
             return ERROR;

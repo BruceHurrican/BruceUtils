@@ -33,6 +33,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
@@ -43,6 +48,8 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -160,6 +167,7 @@ public final class PublicUtil {
      * @return boolean
      */
     public static String isRootSystem() {
+        Log.i("aa","haha");
         if (systemRootState == kSystemRootStateEnable) {
             return "当前手机是否已经root ? 已经root";
         } else if (systemRootState == kSystemRootStateDisable) {
@@ -395,5 +403,208 @@ public final class PublicUtil {
             e.printStackTrace();
         }
         return channelName;
+    }
+
+    /**
+     * 获取 app 应用图标
+     * @param context
+     * @param apkPath
+     * @return
+     */
+    public static Drawable getApkThumbnail(Context context, String apkPath) {
+        if (null == context) {
+            LogUtils.i("param context is null");
+            return null;
+        }
+
+        PackageManager packageManager = context.getPackageManager();
+        PackageInfo packageInfo = packageManager.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
+        ApplicationInfo applicationInfo = packageInfo.applicationInfo;
+        applicationInfo.sourceDir = apkPath;
+        applicationInfo.publicSourceDir = apkPath;
+        if (null != applicationInfo) {
+            return applicationInfo.loadIcon(packageManager);
+        }
+        LogUtils.i("applicationInfo is null");
+        return null;
+    }
+
+    /**
+     * 获取Drawable实际占用大小
+     * @param drawable
+     * @return
+     */
+    public static int getDrawableSize(Drawable drawable){
+        if (null == drawable) {
+            LogUtils.i("param drawable is null");
+            return -1;
+        }
+
+        // 取 drawable 的长宽
+        int w = drawable.getIntrinsicWidth();
+        int h = drawable.getIntrinsicHeight();
+
+        // 取 drawable 的颜色格式
+        Bitmap.Config config = drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888
+                : Bitmap.Config.RGB_565;
+        // 建立对应 bitmap
+        Bitmap bitmap = Bitmap.createBitmap(w, h, config);
+        // 建立对应 bitmap 的画布
+        Canvas canvas = new Canvas(bitmap);
+//        drawable.setBounds(0, 0, w, h);
+        // 把 drawable 内容画到画布中
+        drawable.draw(canvas);
+
+//        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.fav_jpg);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        int len = baos.toByteArray().length;
+        LogUtils.i("drawable 占用大小: " + len);
+        return len;
+    }
+
+    /**
+     * Bitmap压缩到指定的千字节数（比方说图片要压缩成32K，则传32）
+     *
+     * @param srcBitmap
+     * @param maxKByteCount 比方说图片要压缩成32K，则传32
+     * @return
+     */
+    public static Bitmap compressBitmap(Bitmap srcBitmap, int maxKByteCount) {
+        if (null == srcBitmap) {
+            LogUtils.i("param srcBitmap is null");
+            return null;
+        }
+        ByteArrayOutputStream baos = null;
+        try {
+            baos = new ByteArrayOutputStream();
+            srcBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            int option = 98;
+            while (baos.toByteArray().length / 1024 >= maxKByteCount && option > 0) {
+                baos.reset();
+                srcBitmap.compress(Bitmap.CompressFormat.JPEG, option, baos);
+                option -= 2;
+            }
+        } catch (Exception e) {
+
+        }
+//        bitmap = BitmapFactory.decodeByteArray(bitmapByte, 0, bitmapByte.length);
+        //把压缩后的数据baos存放到ByteArrayInputStream中
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        //把ByteArrayInputStream数据生成图片
+        Bitmap bitmap = BitmapFactory.decodeStream(bais, null, null);
+        return bitmap;
+    }
+
+    /**
+     * 判断一个Android应用文件是否装过
+     * @param context
+     * @param filePath
+     * @return true装过， 反之未装过
+     */
+    public static boolean isInstalled(Context context, String filePath){
+        String packageName = getPackageName(context, filePath);
+        return  isAppInstalled(context, packageName);
+    }
+
+    /**
+     * 获取应用包名
+     * @param context
+     * @param filePath
+     * @return
+     */
+    public static String getPackageName(Context context, String filePath){
+        String packageName = "";
+
+        if(context == null || TextUtils.isEmpty(filePath)){
+            return packageName;
+        }
+
+        PackageManager pm = context.getPackageManager();
+        PackageInfo info = pm.getPackageArchiveInfo(filePath, PackageManager.GET_ACTIVITIES);
+        ApplicationInfo appInfo = null;
+        if (info != null) {
+            appInfo = info.applicationInfo;
+            packageName = appInfo.packageName;
+        }
+
+        return packageName;
+    }
+
+    /**
+     * 判断指定报名的App是否装过
+     * @param context
+     * @param packagename
+     * @return
+     */
+    public static boolean isAppInstalled(Context context,String packagename) {
+        if (null == context) {
+            LogUtils.i("param context is null");
+            return false;
+        }
+        PackageInfo packageInfo;
+        try {
+            packageInfo = context.getPackageManager().getPackageInfo(packagename, 0);
+        }catch (PackageManager.NameNotFoundException e) {
+            packageInfo = null;
+            e.printStackTrace();
+        }
+        if(packageInfo ==null){
+            LogUtils.i("没有安装");
+            return false;
+        }else{
+            LogUtils.i("已经安装");
+            return true;
+        }
+    }
+
+    /**
+     * 安装Apk文件
+     * @param context
+     * @param apkFilePath
+     */
+    public static void install(Context context, String apkFilePath){
+        if(context == null){
+            LogUtils.i("parameter context is null");
+            return;
+        }
+
+        File file = new File(apkFilePath);
+
+        if(!file.exists()){
+            return ;
+        }
+
+        Intent intent = new Intent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(file),
+                "application/vnd.android.package-archive");
+        context.startActivity(intent);
+    }
+
+    /**
+     * 判断指定的ipAddress是否可以ping
+     * @param ipAddress
+     * @return
+     */
+    public static boolean pingIpAddress(String ipAddress) {
+        try {
+            Process process = Runtime.getRuntime().exec("/system/bin/ping -c 1 -w 100 " + ipAddress);
+            int status = process.waitFor();
+            if (status == 0) {
+                LogUtils.d("ip ping is ok");
+                return true;
+            } else {
+                LogUtils.d("ip ping is not ok");
+                return false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
